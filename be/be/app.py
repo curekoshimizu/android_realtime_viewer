@@ -7,16 +7,34 @@ from fastapi.staticfiles import StaticFiles
 from starlette.responses import StreamingResponse
 from starlette.routing import Route
 
-from .camera import DummyGamingCamera
+from .camera import DummyGamingCamera, AndroidCamera
 
 _logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
 
-@router.get("/video")
+@router.get("/game/video")
 async def video_feed() -> StreamingResponse:
     camera = DummyGamingCamera(size=(100, 200))
+
+    def stream() -> Iterator[bytes]:
+        _logger.info("stream started!")
+        try:
+            for frame in camera.generate():
+                yield b"--frame\r\n" b"Content-Type: image/webp\r\n\r\n" + frame + b"\r\n"
+                time.sleep(0.001)
+        except Exception:
+            _logger.exception("Exception Occured")
+        finally:
+            _logger.info("stream has done.")
+
+    return StreamingResponse(stream(), media_type="multipart/x-mixed-replace; boundary=frame")
+
+
+@router.get("/android/video")
+async def video_feed() -> StreamingResponse:
+    camera = AndroidCamera()
 
     def stream() -> Iterator[bytes]:
         _logger.info("stream started!")

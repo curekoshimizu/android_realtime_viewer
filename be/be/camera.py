@@ -1,4 +1,5 @@
 from __future__ import annotations
+import subprocess
 
 import io
 from abc import ABC, abstractmethod
@@ -35,6 +36,22 @@ class DummyGamingCamera(Camera):
     def generate(self) -> Iterator[bytes]:
         for r, g, b in self.color_generator():
             image = Image.new("RGBA", size=self._size, color=(r, g, b))
+            with io.BytesIO() as frame:
+                image.save(frame, "webp")
+                yield frame.getvalue()
+
+
+class AndroidCamera(Camera):
+    def screencap2pil(self, width: int, height: int):
+        pipe = subprocess.Popen("adb shell screencap", stdin=subprocess.PIPE, stdout=subprocess.PIPE, shell=True)
+        img_bytes = pipe.stdout.read()
+        return Image.frombuffer("RGBA", (width, height), img_bytes[12:], "raw", "RGBX", 0, 1)
+
+    def generate(self) -> Iterator[bytes]:
+        while True:
+            width = 1080
+            height = 2340
+            image = self.screencap2pil(width, height)
             with io.BytesIO() as frame:
                 image.save(frame, "webp")
                 yield frame.getvalue()
