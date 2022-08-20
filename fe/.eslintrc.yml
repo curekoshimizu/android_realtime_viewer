@@ -1,0 +1,42 @@
+env:
+  browser: true
+  es2021: true
+extends:
+  - plugin:react/recommended
+  - plugin:react-hooks/recommended
+  - airbnb
+  - airbnb-typescript
+parser: '@typescript-eslint/parser'
+parserOptions:
+  ecmaFeatures:
+    jsx: true
+  ecmaVersion: latest
+  sourceType: module
+  project: ./tsconfig.json
+plugins:
+  - react
+  - react-hooks
+  - '@typescript-eslint'
+  - unused-imports
+rules:
+  react-hooks/rules-of-hooks: error
+  react-hooks/exhaustive-deps: warn
+  react/react-in-jsx-scope: off
+  react/jsx-filename-extension:
+  - 1
+  - extensions:
+    - ".ts"
+    - ".tsx"
+  react/function-component-definition:
+    - 2
+    - namedComponents: arrow-function
+  unused-imports/no-unused-imports-ts: warn
+  sort-imports: off
+  import/order:
+    - warn
+    - 
+      newlines-between: always
+      alphabetize:
+        order: asc
+        caseInsensitive: true
+  react/require-default-props: off
