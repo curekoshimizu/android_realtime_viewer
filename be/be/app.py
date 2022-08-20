@@ -1,21 +1,35 @@
-from dataclasses import dataclass
-from typing import Optional
-from starlette.routing import Route
+import logging
+import time
+from typing import Iterator, Optional
 
 from fastapi import APIRouter, FastAPI
 from fastapi.staticfiles import StaticFiles
+from starlette.responses import StreamingResponse
+from starlette.routing import Route
+
+from .camera import DummyGamingCamera
+
+_logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
 
-@dataclass
-class Response:
-    resp: str
+@router.get("/video")
+async def video_feed() -> StreamingResponse:
+    camera = DummyGamingCamera(size=(100, 200))
 
+    def stream() -> Iterator[bytes]:
+        _logger.info("stream started!")
+        try:
+            for frame in camera.generate():
+                yield b"--frame\r\n" b"Content-Type: image/webp\r\n\r\n" + frame + b"\r\n"
+                time.sleep(0.001)
+        except Exception:
+            _logger.exception("Exception Occured")
+        finally:
+            _logger.info("stream has done.")
 
-@router.get("/ping", response_model=list[Response])
-async def ping() -> list[Response]:
-    return [Response(resp="pong")]
+    return StreamingResponse(stream(), media_type="multipart/x-mixed-replace; boundary=frame")
 
 
 app = FastAPI()

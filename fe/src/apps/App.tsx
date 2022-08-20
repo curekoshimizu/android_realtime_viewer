@@ -3,8 +3,8 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 import StyledAppBar from '../components/StyledAppBar';
 import BoxExample from '../pages/BoxExample';
+import NotFound from '../pages/NotFound';
 import ReduxExampleApp from '../pages/ReduxExample';
-import NotFound from "../pages/NotFound";
 
 const links = [
   { label: 'box example', path: '/' },

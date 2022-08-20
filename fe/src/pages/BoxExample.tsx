@@ -15,6 +15,12 @@ const Item = styled(Paper)(({ theme }) => ({
 const BoxExample = () => (
   <>
     <Typography variant="h4">Grid</Typography>
+    <img
+      alt="video_image"
+      onError={() => console.log('failed')}
+      src="/api/video"
+    />
+
     <Grid container columnSpacing={10} rowSpacing={2}>
       <Grid item xs={8}>
         <Item>xs=8</Item>
