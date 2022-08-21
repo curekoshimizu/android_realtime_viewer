@@ -94,7 +94,7 @@ class DecodeScript:
         self._adb.text(args[0].string)
 
     def _screenshot(self, args: list[TokenInfo]) -> None:
-        assert len(args) == 1
+        assert len(args) == 0
         name = datetime.datetime.now().strftime("%Y_%m_%d__%H_%M_%S.png")
         self._adb.screenshot(name)
 

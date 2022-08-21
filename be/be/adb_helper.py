@@ -1,7 +1,10 @@
 import subprocess
 import time
+import pathlib
 
 from PIL import Image  # type:ignore
+
+images_dir = pathlib.Path(__file__).parents[1] / "assets" / "images"
 
 
 class AdbHelper:
@@ -31,5 +34,4 @@ class AdbHelper:
         assert pipe.stdout is not None
         img_bytes = pipe.stdout.read()
         img = Image.frombuffer("RGBA", (width, height), img_bytes[12:], "raw", "RGBX", 0, 1)
-        with open(name) as f:
-            img.save(f, "png")
+        img.convert("RGBA").save(images_dir / name)
