@@ -59,7 +59,6 @@ def go_home(adb: AdbHelper) -> None:
     adb.click(1002, 2258)
     adb.sleep(4100)
     adb.click(1002, 2258)
-    import ipdb; ipdb.set_trace()
 
     adb.sleep(7100)
     adb.click(1002, 2258)
@@ -81,7 +80,6 @@ def go_home(adb: AdbHelper) -> None:
     adb.click(400, 2055)
     adb.sleep(3200)
     adb.click(400, 2055)
-
 
 
 def main() -> None:
