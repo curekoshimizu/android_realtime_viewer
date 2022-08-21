@@ -52,6 +52,43 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+  /api/android/scripts:
+    get:
+      summary: Android Scripts
+      operationId: android_scripts_api_android_scripts_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                title: Response Android Scripts Api Android Scripts Get
+                type: array
+                items:
+                  type: string
+  /api/android/scripts/:script:
+    post:
+      summary: Android Run Script
+      operationId: android_run_script_api_android_scripts__script_post
+      parameters:
+      - required: true
+        schema:
+          title: Script
+          type: string
+        name: script
+        in: query
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
 components:
   schemas:
     HTTPValidationError:

@@ -9,6 +9,7 @@ from starlette.routing import Route
 
 from .adb_helper import AdbHelper
 from .camera import AndroidCamera, DummyGamingCamera
+from .decode_script import DecodeScript
 
 _logger = logging.getLogger(__name__)
 
@@ -55,6 +56,18 @@ async def android_video_feed() -> StreamingResponse:
 async def android_click(x: int, y: int) -> None:
     adb = AdbHelper()
     adb.click(x, y)
+
+
+@router.get("/android/scripts", response_model=list[str])
+async def android_scripts() -> list[str]:
+    scripts = DecodeScript(AdbHelper())
+    return scripts.scripts()
+
+
+@router.post("/android/scripts/:script")
+async def android_run_script(script: str) -> None:
+    scripts = DecodeScript(AdbHelper())
+    scripts.run(script)
 
 
 app = FastAPI()

@@ -4,6 +4,7 @@ import {
 import {
   MouseEvent, useState,
 } from 'react';
+import useEffectAsync from 'use-async-effect';
 
 import { DefaultApi, Configuration } from '../client';
 
@@ -13,7 +14,32 @@ interface Point {
   unixTime: number;
 }
 
-const ClickPoint = ({ src }: { src: string }) => {
+const ScriptList = () => {
+  const [scriptNames, setScriptNames] = useState<string[]>([]);
+
+  useEffectAsync(async () => {
+    const config = new Configuration({
+      basePath: '',
+    });
+    const api = new DefaultApi(config);
+    const ret = await api.androidScriptsApiAndroidScriptsGet();
+    setScriptNames(ret);
+  }, []);
+
+  return (
+    <>
+      {
+                scriptNames.map((name) => (
+                  <Box m={2}>
+                    <Button key={name} variant="contained" onClick={() => {}}>{name}</Button>
+                  </Box>
+                ))
+            }
+    </>
+  );
+};
+
+const Script = ({ src }: { src: string }) => {
   const [pointHistory, setPointHistory] = useState<Point[]>([]);
   const [startTime, setStartTime] = useState<number | null>(null);
   const originalHeight = 2340;
@@ -56,8 +82,9 @@ const ClickPoint = ({ src }: { src: string }) => {
       </Grid>
       <Grid item xs={4}>
         <Box m={2}>
-          <Button variant="contained" onClick={() => setPointHistory([])}>clear</Button>
+          <Button variant="contained" onClick={() => setPointHistory([])}>clear history</Button>
         </Box>
+        <ScriptList />
         <Box>
           {
               pointHistory.map((point, i, arr) => {
@@ -88,8 +115,8 @@ const ClickPoint = ({ src }: { src: string }) => {
   );
 };
 
-const SimulationApp = () => (
-  <ClickPoint src="/api/android/video" />
+const ScriptApp = () => (
+  <Script src="/api/android/video" />
 );
 
-export default SimulationApp;
+export default ScriptApp;

@@ -27,6 +27,10 @@ export interface AndroidClickApiAndroidClickPostRequest {
     y: number;
 }
 
+export interface AndroidRunScriptApiAndroidScriptsScriptPostRequest {
+    script: string;
+}
+
 /**
  * 
  */
@@ -71,6 +75,66 @@ export class DefaultApi extends runtime.BaseAPI {
      */
     async androidClickApiAndroidClickPost(requestParameters: AndroidClickApiAndroidClickPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<any> {
         const response = await this.androidClickApiAndroidClickPostRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Android Run Script
+     */
+    async androidRunScriptApiAndroidScriptsScriptPostRaw(requestParameters: AndroidRunScriptApiAndroidScriptsScriptPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<any>> {
+        if (requestParameters.script === null || requestParameters.script === undefined) {
+            throw new runtime.RequiredError('script','Required parameter requestParameters.script was null or undefined when calling androidRunScriptApiAndroidScriptsScriptPost.');
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters.script !== undefined) {
+            queryParameters['script'] = requestParameters.script;
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/android/scripts/:script`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.TextApiResponse(response) as any;
+    }
+
+    /**
+     * Android Run Script
+     */
+    async androidRunScriptApiAndroidScriptsScriptPost(requestParameters: AndroidRunScriptApiAndroidScriptsScriptPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<any> {
+        const response = await this.androidRunScriptApiAndroidScriptsScriptPostRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Android Scripts
+     */
+    async androidScriptsApiAndroidScriptsGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<string>>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/android/scripts`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse<any>(response);
+    }
+
+    /**
+     * Android Scripts
+     */
+    async androidScriptsApiAndroidScriptsGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<string>> {
+        const response = await this.androidScriptsApiAndroidScriptsGetRaw(initOverrides);
         return await response.value();
     }
 

@@ -4,11 +4,11 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import StyledAppBar from '../components/StyledAppBar';
 import ClickPointApp from '../pages/ClickPointApp';
 import NotFound from '../pages/NotFound';
-import SimulationApp from '../pages/SimulationApp';
+import ScriptApp from '../pages/ScriptApp';
 
 const links = [
   { label: 'Android Click Helper', path: '/' },
-  { label: 'Android Simulation', path: '/simulation' },
+  { label: 'Android Simulation', path: '/script' },
 ];
 
 const App = () => (
@@ -18,7 +18,7 @@ const App = () => (
       <StyledAppBar links={links} />
       <Routes>
         <Route path="/" element={<ClickPointApp />} />
-        <Route path="/simulation" element={<SimulationApp />} />
+        <Route path="/script" element={<ScriptApp />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Container>
