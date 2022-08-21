@@ -1,4 +1,6 @@
-import { Grid, Box, Typography } from '@mui/material';
+import {
+  Grid, Box, Button, Typography,
+} from '@mui/material';
 import {
   MouseEvent, useState,
 } from 'react';
@@ -12,7 +14,7 @@ interface Point {
 }
 
 const ClickPoint = ({ src }: { src: string }) => {
-  const [pointHistory, setHistory] = useState<Point[]>([]);
+  const [pointHistory, setPointHistory] = useState<Point[]>([]);
   const [startTime, setStartTime] = useState<number | null>(null);
   const originalHeight = 2340;
   const height = 1000;
@@ -30,7 +32,7 @@ const ClickPoint = ({ src }: { src: string }) => {
     const api = new DefaultApi(config);
     await api.androidClickApiAndroidClickPost({ x, y });
     const unixTime = (new Date()).getTime();
-    setHistory([...pointHistory, { x, y, unixTime }]);
+    setPointHistory([...pointHistory, { x, y, unixTime }]);
     if (!startTime) {
       setStartTime(unixTime);
     }
@@ -53,6 +55,9 @@ const ClickPoint = ({ src }: { src: string }) => {
         </Box>
       </Grid>
       <Grid item xs={4}>
+        <Box m={2}>
+          <Button variant="contained" onClick={() => setPointHistory([])}>clear</Button>
+        </Box>
         <Box>
           {
               pointHistory.map((point, i, arr) => {
