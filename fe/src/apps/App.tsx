@@ -2,13 +2,11 @@ import { CssBaseline, Container } from '@mui/material';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 import StyledAppBar from '../components/StyledAppBar';
-import BoxExample from '../pages/BoxExample';
+import ClickPointApp from '../pages/ClickPointApp';
 import NotFound from '../pages/NotFound';
-import ReduxExampleApp from '../pages/ReduxExample';
 
 const links = [
-  { label: 'box example', path: '/' },
-  { label: 'redux example', path: '/redux_example' },
+  { label: 'Android Click Helper', path: '/' },
 ];
 
 const App = () => (
@@ -17,8 +15,7 @@ const App = () => (
     <Container maxWidth="lg" fixed>
       <StyledAppBar links={links} />
       <Routes>
-        <Route path="/" element={<BoxExample />} />
-        <Route path="/redux_example" element={<ReduxExampleApp />} />
+        <Route path="/" element={<ClickPointApp />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Container>
