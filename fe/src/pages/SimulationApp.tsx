@@ -1,0 +1,90 @@
+import { Grid, Box, Typography } from '@mui/material';
+import {
+  MouseEvent, useState,
+} from 'react';
+
+import { DefaultApi, Configuration } from '../client';
+
+interface Point {
+  x: number;
+  y: number;
+  unixTime: number;
+}
+
+const ClickPoint = ({ src }: { src: string }) => {
+  const [pointHistory, setHistory] = useState<Point[]>([]);
+  const [startTime, setStartTime] = useState<number | null>(null);
+  const originalHeight = 2340;
+  const height = 1000;
+  const scale = originalHeight / height;
+
+  const onClick = async (event : MouseEvent) => {
+    const target = (event.target as HTMLButtonElement);
+
+    const x = Math.round((event.clientX - target.offsetLeft) * scale);
+    const y = Math.round((event.clientY - target.offsetTop) * scale);
+
+    const config = new Configuration({
+      basePath: '',
+    });
+    const api = new DefaultApi(config);
+    await api.androidClickApiAndroidClickPost({ x, y });
+    const unixTime = (new Date()).getTime();
+    setHistory([...pointHistory, { x, y, unixTime }]);
+    if (!startTime) {
+      setStartTime(unixTime);
+    }
+  };
+
+  return (
+    <Grid container>
+      <Grid item xs={8}>
+        <Box
+          display="flex"
+          justifyContent="center"
+        >
+
+          <img
+            height={height}
+            onClick={onClick}
+            alt="video_image"
+            src={src}
+          />
+        </Box>
+      </Grid>
+      <Grid item xs={4}>
+        <Box>
+          {
+              pointHistory.map((point, i, arr) => {
+                let delta = 0;
+                if (i > 0) {
+                  delta = arr[i].unixTime - arr[i - 1].unixTime;
+                  delta = Math.round(delta / 100) * 100;
+                }
+                return (
+                  <>
+                    {delta > 0 && (
+                      <Typography variant="h6">
+                        {`sleep(${delta})`}
+                      </Typography>
+
+                    )}
+
+                    <Typography variant="h6">
+                      {`click(${point.x}, ${point.y})`}
+                    </Typography>
+                  </>
+                );
+              })
+}
+        </Box>
+      </Grid>
+    </Grid>
+  );
+};
+
+const SimulationApp = () => (
+  <ClickPoint src="/api/android/video" />
+);
+
+export default SimulationApp;

@@ -3,28 +3,84 @@ info:
   title: FastAPI
   version: 0.1.0
 paths:
-  /api/ping:
+  /api/game/video:
     get:
-      summary: Ping
-      operationId: ping_api_ping_get
+      summary: Video Feed
+      operationId: video_feed_api_game_video_get
       responses:
         '200':
           description: Successful Response
           content:
             application/json:
+              schema: {}
+  /api/android/video:
+    get:
+      summary: Android Video Feed
+      operationId: android_video_feed_api_android_video_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /api/android/click:
+    post:
+      summary: Android Click
+      operationId: android_click_api_android_click_post
+      parameters:
+      - required: true
+        schema:
+          title: X
+          type: integer
+        name: x
+        in: query
+      - required: true
+        schema:
+          title: Y
+          type: integer
+        name: y
+        in: query
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
               schema:
-                title: Response Ping Api Ping Get
-                type: array
-                items:
-                  $ref: '#/components/schemas/Response'
+                $ref: '#/components/schemas/HTTPValidationError'
 components:
   schemas:
-    Response:
-      title: Response
-      required:
-      - resp
+    HTTPValidationError:
+      title: HTTPValidationError
       type: object
       properties:
-        resp:
-          title: Resp
+        detail:
+          title: Detail
+          type: array
+          items:
+            $ref: '#/components/schemas/ValidationError'
+    ValidationError:
+      title: ValidationError
+      required:
+      - loc
+      - msg
+      - type
+      type: object
+      properties:
+        loc:
+          title: Location
+          type: array
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+        msg:
+          title: Message
+          type: string
+        type:
+          title: Error Type
           type: string

@@ -15,12 +15,17 @@
 
 import * as runtime from '../runtime';
 import type {
-  Response,
+  HTTPValidationError,
 } from '../models';
 import {
-    ResponseFromJSON,
-    ResponseToJSON,
+    HTTPValidationErrorFromJSON,
+    HTTPValidationErrorToJSON,
 } from '../models';
+
+export interface AndroidClickApiAndroidClickPostRequest {
+    x: number;
+    y: number;
+}
 
 /**
  * 
@@ -28,28 +33,96 @@ import {
 export class DefaultApi extends runtime.BaseAPI {
 
     /**
-     * Ping
+     * Android Click
      */
-    async pingApiPingGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Response>>> {
+    async androidClickApiAndroidClickPostRaw(requestParameters: AndroidClickApiAndroidClickPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<any>> {
+        if (requestParameters.x === null || requestParameters.x === undefined) {
+            throw new runtime.RequiredError('x','Required parameter requestParameters.x was null or undefined when calling androidClickApiAndroidClickPost.');
+        }
+
+        if (requestParameters.y === null || requestParameters.y === undefined) {
+            throw new runtime.RequiredError('y','Required parameter requestParameters.y was null or undefined when calling androidClickApiAndroidClickPost.');
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters.x !== undefined) {
+            queryParameters['x'] = requestParameters.x;
+        }
+
+        if (requestParameters.y !== undefined) {
+            queryParameters['y'] = requestParameters.y;
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/android/click`,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.TextApiResponse(response) as any;
+    }
+
+    /**
+     * Android Click
+     */
+    async androidClickApiAndroidClickPost(requestParameters: AndroidClickApiAndroidClickPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<any> {
+        const response = await this.androidClickApiAndroidClickPostRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Android Video Feed
+     */
+    async androidVideoFeedApiAndroidVideoGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<any>> {
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/api/ping`,
+            path: `/api/android/video`,
             method: 'GET',
             headers: headerParameters,
             query: queryParameters,
         }, initOverrides);
 
-        return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(ResponseFromJSON));
+        return new runtime.TextApiResponse(response) as any;
     }
 
     /**
-     * Ping
+     * Android Video Feed
      */
-    async pingApiPingGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<Response>> {
-        const response = await this.pingApiPingGetRaw(initOverrides);
+    async androidVideoFeedApiAndroidVideoGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<any> {
+        const response = await this.androidVideoFeedApiAndroidVideoGetRaw(initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Video Feed
+     */
+    async videoFeedApiGameVideoGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<any>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/game/video`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.TextApiResponse(response) as any;
+    }
+
+    /**
+     * Video Feed
+     */
+    async videoFeedApiGameVideoGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<any> {
+        const response = await this.videoFeedApiGameVideoGetRaw(initOverrides);
         return await response.value();
     }
 

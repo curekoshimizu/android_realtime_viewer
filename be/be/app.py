@@ -7,6 +7,7 @@ from fastapi.staticfiles import StaticFiles
 from starlette.responses import StreamingResponse
 from starlette.routing import Route
 
+from .adb_helper import AdbHelper
 from .camera import AndroidCamera, DummyGamingCamera
 
 _logger = logging.getLogger(__name__)
@@ -48,6 +49,12 @@ async def android_video_feed() -> StreamingResponse:
             _logger.info("stream has done.")
 
     return StreamingResponse(stream(), media_type="multipart/x-mixed-replace; boundary=frame")
+
+
+@router.post("/android/click")
+async def android_click(x: int, y: int) -> None:
+    adb = AdbHelper()
+    adb.click(x, y)
 
 
 app = FastAPI()

@@ -1,7 +1,8 @@
-.openapi-generator-ignore
 apis/DefaultApi.ts
 apis/index.ts
 index.ts
-models/Response.ts
+models/HTTPValidationError.ts
+models/LocationInner.ts
+models/ValidationError.ts
 models/index.ts
 runtime.ts
