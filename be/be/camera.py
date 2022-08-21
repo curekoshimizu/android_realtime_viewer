@@ -1,8 +1,8 @@
 from __future__ import annotations
-import time
-import subprocess
 
 import io
+import subprocess
+import time
 from abc import ABC, abstractmethod
 from typing import Iterator, Tuple
 
@@ -43,8 +43,9 @@ class DummyGamingCamera(Camera):
 
 
 class AndroidCamera(Camera):
-    def screencap2pil(self, width: int, height: int):
+    def screencap2pil(self, width: int, height: int) -> Image.Image:
         pipe = subprocess.Popen("adb shell screencap", stdin=subprocess.PIPE, stdout=subprocess.PIPE, shell=True)
+        assert pipe.stdout is not None
         img_bytes = pipe.stdout.read()
         return Image.frombuffer("RGBA", (width, height), img_bytes[12:], "raw", "RGBX", 0, 1)
 
