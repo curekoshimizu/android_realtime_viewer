@@ -8,7 +8,7 @@ import ScriptApp from '../pages/ScriptApp';
 
 const links = [
   { label: 'Android Click Helper', path: '/' },
-  { label: 'Android Simulation', path: '/script' },
+  { label: 'Android Scripts', path: '/script' },
 ];
 
 const App = () => (
