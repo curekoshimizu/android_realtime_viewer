@@ -1,95 +1,125 @@
+import { Box, Typography } from '@mui/material';
 import {
-  Grid, Paper, Box, Typography,
-} from '@mui/material';
-import { styled } from '@mui/material/styles';
+  MouseEvent, useState, useEffect,
+} from 'react';
 
-import { BoldDiv, BoldSpan } from '../components/BoldBox';
+const width = 100;
+const height = 200;
 
-const Item = styled(Paper)(({ theme }) => ({
-  backgroundColor: 'yellow',
-  padding: theme.spacing(3),
-  textAlign: 'center',
-  color: theme.palette.text.secondary,
-}));
+const App = () => {
+  const [bgColor, setBgColor] = useState<string>('#888888');
+  const [foColor, setFoColor] = useState<string>('#000000');
+
+  const [png, setPng] = useState<string | null>(null);
+
+  useEffect(() => {
+    const canvasElem = document.createElement('canvas');
+    canvasElem.width = width;
+    canvasElem.height = height;
+
+    const ctx = canvasElem && canvasElem.getContext('2d');
+    if (!canvasElem || !ctx) return;
+
+    // draw
+
+    ctx.clearRect(0, 0, width, height);
+    ctx.fillStyle = '#33333333';
+    ctx.fillRect(0, 0, width / 2, height / 2);
+
+    // ctx.fillStyle = foColor;
+    // ctx.fillText('Hello', width / 6, height / 2);
+
+    setPng(canvasElem.toDataURL());
+  }, [bgColor, foColor]);
+
+  return (
+    <div>
+      <h3>画像生成</h3>
+      <h4>背景色</h4>
+      {['#f00', '#0f0', '#00f'].map((color) => (
+        <button
+          type="button"
+          key={color}
+          style={{ background: color }}
+          onClick={() => setBgColor(color)}
+        >
+          {color}
+        </button>
+      ))}
+      <h4>文字色</h4>
+      {['#f00', '#0f0', '#00f'].map((color) => (
+        <button
+          type="button"
+          key={color}
+          style={{ color }}
+          onClick={() => setFoColor(color)}
+        >
+          {color}
+        </button>
+      ))}
+      <h4>生成</h4>
+      {png && (
+        <div className="comp" style={{ display: 'flex' }}>
+          <img
+            alt="video_image"
+            src="/api/game/video"
+          />
+          <img alt="icon" src={png} />
+          <img alt="round icon" src={png} />
+        </div>
+      )}
+    </div>
+  );
+};
+
+interface Point {
+  x: number;
+  y: number;
+}
+
+const MouseExample = () => {
+  const [point, setPoint] = useState<Point | null>(null);
+
+  const handleMouseMove = (event : MouseEvent) => {
+    const target = (event.target as HTMLButtonElement);
+    setPoint({
+      x: event.clientX - target.offsetLeft,
+      y: event.clientY - target.offsetTop,
+    });
+  };
+
+  return (
+    <>
+      <Box
+        display="flex"
+        justifyContent="center"
+      >
+        <img
+          onClick={handleMouseMove}
+          alt="video_image"
+          src="/api/game/video"
+        />
+      </Box>
+      {
+          point && (
+          <div>
+              {`(x, y) = (${point.x}, ${point.y})`}
+          </div>
+          )
+      }
+    </>
+  );
+};
 
 const BoxExample = () => (
   <>
-    <Typography variant="h4">Grid</Typography>
+    <Typography variant="h4">Mouse Event</Typography>
+    <MouseExample />
+    <App />
     <img
       alt="video_image"
       src="/api/android/video"
     />
-    <img
-      alt="video_image"
-      src="/api/game/video"
-    />
-
-    <Grid container columnSpacing={10} rowSpacing={2}>
-      <Grid item xs={8}>
-        <Item>xs=8</Item>
-      </Grid>
-      <Grid item xs={4}>
-        <Item>xs=4</Item>
-      </Grid>
-      <Grid item xs={4}>
-        <Item>xs=4</Item>
-      </Grid>
-      <Grid item xs={8}>
-        <Item>xs=8</Item>
-      </Grid>
-    </Grid>
-    <Box m={5} />
-    <Typography variant="h4">BOLD</Typography>
-    <Typography variant="h6">
-      When you want to use bold span, use
-      {' '}
-      <BoldSpan>&quot;BoldSpan&quot;</BoldSpan>
-      {' '}
-      !
-    </Typography>
-    <Typography variant="h6">
-      When you want to use bold div, use
-      {' '}
-      <BoldDiv>&quot;BoldDiv&quot;</BoldDiv>
-      {' '}
-      !
-    </Typography>
-    <Box m={5} />
-    <Typography variant="h4">Centering</Typography>
-    <Box
-      display="flex"
-      width={500}
-      height={200}
-      bgcolor="lightblue"
-    >
-      <Box m="auto">
-        <Box>1. Box</Box>
-        <Box>use m=&quot;auto&quot; with Box</Box>
-      </Box>
-    </Box>
-    <Box
-      display="flex"
-      width={500}
-      height={200}
-      bgcolor="lightgreen"
-      alignItems="center"
-      justifyContent="center"
-    >
-      <div>2. Box</div>
-      <div>use alignItems and justifyContent with Box</div>
-    </Box>
-    <Box m={5} />
-    <Typography variant="h4">m (margin) and p (padding)</Typography>
-    <Typography variant="h6">
-      unit is `theme.space`.
-      theme.space(1) is 4px by default.
-    </Typography>
-    <Box textAlign="center">
-      <Box m={10} p={0} bgcolor="#ef5350">m=10 p=0 </Box>
-      <Box m={0} p={0} bgcolor="#ab47bc">m=0 p=0</Box>
-      <Box m={0} p={10} bgcolor="#5c6bc0">m=0 p=10</Box>
-      <Box m={10} p={10} bgcolor="#29b6f6">m=10 p=10</Box>
-    </Box>
   </>
 );
 

@@ -55,3 +55,4 @@ class AndroidCamera(Camera):
             with io.BytesIO() as frame:
                 image.save(frame, "webp")
                 yield frame.getvalue()
+                time.sleep(0.05)
