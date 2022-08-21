@@ -1,4 +1,4 @@
 sleep(100)
 click(0, 0)
 sleep(10)
-swipe(0, 0, 0, 0)
+swipe(0, 0, 0, -100)

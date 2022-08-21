@@ -1,0 +1,5 @@
+go_title_from_lobby()
+sleep(2000)
+click(309, 922)
+sleep(2000)
+delete_account()

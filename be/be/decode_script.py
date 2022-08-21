@@ -1,5 +1,6 @@
+import datetime
 import pathlib
-from tokenize import ENCODING, ENDMARKER, NAME, NEWLINE, NUMBER, OP, TokenInfo, tokenize
+from tokenize import ENCODING, ENDMARKER, NAME, NEWLINE, NL, NUMBER, OP, STRING, TokenInfo, tokenize
 
 from .adb_helper import AdbHelper
 
@@ -31,7 +32,7 @@ class DecodeScript:
         index = 0
         while index < len(tokens):
             token = tokens[index]
-            if token.type in [ENCODING, ENDMARKER, NEWLINE]:
+            if token.type in [ENCODING, ENDMARKER, NEWLINE, NL]:
                 index += 1
             elif token.type == NAME:
                 index += 1
@@ -47,18 +48,34 @@ class DecodeScript:
                         break
                     elif t.type == OP and t.string == ",":
                         continue
-                    elif t.type in [NAME, NUMBER]:
+                    elif t.type == OP and t.string == "-":
                         args.append(t)
+                    elif t.type == NAME:
+                        args.append(t)
+                    elif t.type == STRING:
+                        args.append(t)
+                    elif t.type == NUMBER:
+                        args.append(t)
+                    else:
+                        raise NotImplementedError
 
-                if token.string == "sleep":
+                operation_name = token.string
+                if operation_name == "sleep":
                     self._sleep(args)
-                elif token.string == "click":
+                elif operation_name == "click":
                     self._click(args)
-                elif token.string == "swipe":
+                elif operation_name == "swipe":
                     self._swipe(args)
+                elif operation_name == "text":
+                    self._text(args)
+                elif operation_name == "screenshot":
+                    self._screenshot(args)
                 else:
-                    raise NotImplementedError
+                    self._call_script(operation_name, args)
             else:
+                import ipdb  # type:ignore
+
+                ipdb.set_trace()
                 raise NotImplementedError
 
     def _sleep(self, args: list[TokenInfo]) -> None:
@@ -72,8 +89,34 @@ class DecodeScript:
         assert args[1].type == NUMBER
         self._adb.click(int(args[0].string), int(args[1].string))
 
-    def _swipe(self, args: list[TokenInfo]) -> None:
+    def _text(self, args: list[TokenInfo]) -> None:
+        assert len(args) == 1
+        self._adb.text(args[0].string)
+
+    def _screenshot(self, args: list[TokenInfo]) -> None:
+        assert len(args) == 1
+        name = datetime.datetime.now().strftime("%Y_%m_%d__%H_%M_%S.png")
+        self._adb.screenshot(name)
+
+    def _swipe(self, raw_args: list[TokenInfo]) -> None:
+        args = []
+
+        is_negative = False
+        for arg in raw_args:
+            if arg.type == OP and arg.string == "-":
+                is_negative = True
+            else:
+                assert arg.type == NUMBER
+                ret = int(arg.string)
+                if is_negative:
+                    ret *= -1
+                args.append(ret)
+
+                is_negative = False
+
         assert len(args) == 4
-        for i in range(4):
-            assert args[i].type == NUMBER
-        self._adb.swipe(int(args[0].string), int(args[1].string), int(args[2].string), int(args[3].string))
+        self._adb.swipe(*args)
+
+    def _call_script(self, script_name: str, args: list[TokenInfo]) -> None:
+        assert len(args) == 0
+        self.run(script_name)

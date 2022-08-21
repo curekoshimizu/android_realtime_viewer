@@ -66,17 +66,17 @@ paths:
                 type: array
                 items:
                   type: string
-  /api/android/scripts/:script:
+  /api/android/scripts/{script}:
     post:
       summary: Android Run Script
-      operationId: android_run_script_api_android_scripts__script_post
+      operationId: android_run_script_api_android_scripts__script__post
       parameters:
       - required: true
         schema:
           title: Script
           type: string
         name: script
-        in: query
+        in: path
       responses:
         '200':
           description: Successful Response

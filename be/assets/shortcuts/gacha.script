@@ -1,0 +1,25 @@
+click(987, 2239)
+sleep(200)
+click(987, 2239)
+sleep(300)
+click(987, 2239)
+sleep(100)
+click(987, 2239)
+sleep(200)
+click(987, 2239)
+sleep(100)
+click(987, 2239)
+sleep(400)
+click(987, 2239)
+sleep(100)
+click(987, 2239)
+sleep(200)
+click(987, 2239)
+
+
+screenshot()
+sleep(3600)
+click(833, 2069)
+
+
+

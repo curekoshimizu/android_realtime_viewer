@@ -64,7 +64,7 @@ async def android_scripts() -> list[str]:
     return scripts.scripts()
 
 
-@router.post("/android/scripts/:script")
+@router.post("/android/scripts/{script}")
 async def android_run_script(script: str) -> None:
     scripts = DecodeScript(AdbHelper())
     scripts.run(script)

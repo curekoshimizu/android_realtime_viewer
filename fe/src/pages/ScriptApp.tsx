@@ -3,19 +3,39 @@ import {
 } from '@mui/material';
 import {
   MouseEvent, useState,
+  Dispatch,
+  SetStateAction,
 } from 'react';
 import useEffectAsync from 'use-async-effect';
 
 import { DefaultApi, Configuration } from '../client';
 
-interface Point {
+interface Record {
   x: number;
   y: number;
   unixTime: number;
+  funcName: string;
 }
 
-const ScriptList = () => {
+interface ScriptListProp {
+  records: Record[]
+  setRecords: Dispatch<SetStateAction<Record[]>>
+}
+
+const ScriptList = ({ records, setRecords }: ScriptListProp) => {
   const [scriptNames, setScriptNames] = useState<string[]>([]);
+
+  const click = async (script:string) => {
+    const config = new Configuration({
+      basePath: '',
+    });
+    const api = new DefaultApi(config);
+    await api.androidRunScriptApiAndroidScriptsScriptPost({ script });
+    const unixTime = (new Date()).getTime();
+    setRecords([...records, {
+      x: -1, y: -1, unixTime, funcName: script,
+    }]);
+  };
 
   useEffectAsync(async () => {
     const config = new Configuration({
@@ -31,7 +51,7 @@ const ScriptList = () => {
       {
                 scriptNames.map((name) => (
                   <Box m={2}>
-                    <Button key={name} variant="contained" onClick={() => {}}>{name}</Button>
+                    <Button key={name} variant="contained" onClick={() => click(name)}>{name}</Button>
                   </Box>
                 ))
             }
@@ -40,7 +60,7 @@ const ScriptList = () => {
 };
 
 const Script = ({ src }: { src: string }) => {
-  const [pointHistory, setPointHistory] = useState<Point[]>([]);
+  const [records, setRecords] = useState<Record[]>([]);
   const [startTime, setStartTime] = useState<number | null>(null);
   const originalHeight = 2340;
   const height = 1000;
@@ -58,7 +78,9 @@ const Script = ({ src }: { src: string }) => {
     const api = new DefaultApi(config);
     await api.androidClickApiAndroidClickPost({ x, y });
     const unixTime = (new Date()).getTime();
-    setPointHistory([...pointHistory, { x, y, unixTime }]);
+    setRecords([...records, {
+      x, y, unixTime, funcName: 'click',
+    }]);
     if (!startTime) {
       setStartTime(unixTime);
     }
@@ -82,17 +104,22 @@ const Script = ({ src }: { src: string }) => {
       </Grid>
       <Grid item xs={4}>
         <Box m={2}>
-          <Button variant="contained" onClick={() => setPointHistory([])}>clear history</Button>
+          <Button variant="contained" onClick={() => setRecords([])}>clear history</Button>
         </Box>
-        <ScriptList />
+        <ScriptList records={records} setRecords={setRecords} />
         <Box>
           {
-              pointHistory.map((point, i, arr) => {
+              records.map((record, i, arr) => {
                 let delta = 0;
                 if (i > 0) {
                   delta = arr[i].unixTime - arr[i - 1].unixTime;
                   delta = Math.round(delta / 100) * 100;
                 }
+                let note = `${record.funcName}()`;
+                if (record.funcName === 'click') {
+                  note = `click(${record.x}, ${record.y})`;
+                }
+
                 return (
                   <>
                     {delta > 0 && (
@@ -103,7 +130,7 @@ const Script = ({ src }: { src: string }) => {
                     )}
 
                     <Typography variant="h6">
-                      {`click(${point.x}, ${point.y})`}
+                      {note}
                     </Typography>
                   </>
                 );

@@ -88,14 +88,10 @@ export class DefaultApi extends runtime.BaseAPI {
 
         const queryParameters: any = {};
 
-        if (requestParameters.script !== undefined) {
-            queryParameters['script'] = requestParameters.script;
-        }
-
         const headerParameters: runtime.HTTPHeaders = {};
 
         const response = await this.request({
-            path: `/api/android/scripts/:script`,
+            path: `/api/android/scripts/{script}`.replace(`{${"script"}}`, encodeURIComponent(String(requestParameters.script))),
             method: 'POST',
             headers: headerParameters,
             query: queryParameters,
