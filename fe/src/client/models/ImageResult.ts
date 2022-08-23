@@ -31,6 +31,18 @@ export interface ImageResult {
      * @memberof ImageResult
      */
     uuid: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof ImageResult
+     */
+    width: number;
+    /**
+     * 
+     * @type {number}
+     * @memberof ImageResult
+     */
+    height: number;
 }
 
 /**
@@ -40,6 +52,8 @@ export function instanceOfImageResult(value: object): boolean {
     let isInstance = true;
     isInstance = isInstance && "base64" in value;
     isInstance = isInstance && "uuid" in value;
+    isInstance = isInstance && "width" in value;
+    isInstance = isInstance && "height" in value;
 
     return isInstance;
 }
@@ -56,6 +70,8 @@ export function ImageResultFromJSONTyped(json: any, ignoreDiscriminator: boolean
         
         'base64': json['base64'],
         'uuid': json['uuid'],
+        'width': json['width'],
+        'height': json['height'],
     };
 }
 
@@ -70,6 +86,8 @@ export function ImageResultToJSON(value?: ImageResult | null): any {
         
         'base64': value.base64,
         'uuid': value.uuid,
+        'width': value.width,
+        'height': value.height,
     };
 }
 

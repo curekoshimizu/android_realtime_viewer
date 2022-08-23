@@ -18,7 +18,6 @@ interface SnapShotImgProp {
   handleMouseClick: (event: MouseEvent) => void;
   height: number;
   cropMode: boolean;
-  completedCrop?: PixelCrop,
   setCompletedCrop:Dispatch<SetStateAction< PixelCrop | undefined>>,
   imageResult?: ImageResult,
   setImageResult: Dispatch<SetStateAction< ImageResult | undefined>>,
@@ -28,15 +27,16 @@ const SnapShotImg = ({
   height,
   handleMouseClick,
   cropMode,
-  completedCrop,
   setCompletedCrop,
   imageResult,
   setImageResult,
 }: SnapShotImgProp) => {
   const imgRef = useRef<HTMLImageElement>(null);
-  const [crop, setCrop] = useState<Crop>(completedCrop || {
+  const [crop, setCrop] = useState<Crop>({
     x: 10, y: 10, width: 80, height: 80, unit: '%',
   });
+  const [scaleWidth, setScaleWidth] = useState<number>();
+  const [scaleHeight, setScaleHeight] = useState<number>();
 
   useAsyncEffect(async () => {
     const config = new Configuration({
@@ -51,21 +51,38 @@ const SnapShotImg = ({
     return (<div />);
   }
 
+  const onImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    setScaleWidth(imageResult.width / e.currentTarget.width);
+    setScaleHeight(imageResult.height / e.currentTarget.height);
+  };
+
   if (cropMode) {
     return (
       <ReactCrop
         crop={crop}
         keepSelection
         onChange={(c) => setCrop(c)}
-        onComplete={(c) => setCompletedCrop(c)}
+        onComplete={(c) => {
+          if (!(scaleWidth && scaleHeight)) {
+            return;
+          }
+
+          setCompletedCrop({
+            x: Math.round(c.x * scaleWidth),
+            y: Math.round(c.y * scaleHeight),
+            width: Math.round(c.width * scaleWidth),
+            height: Math.round(c.height * scaleHeight),
+            unit: c.unit,
+          });
+        }}
       >
         <img
           ref={imgRef}
           height={height}
           src={`data:image/webp;base64,${imageResult.base64}`}
           alt="captured_image"
+          onLoad={onImageLoad}
         />
-        <div>{completedCrop?.x}</div>
       </ReactCrop>
     );
   }
@@ -111,6 +128,26 @@ const ClickPoint = ({ src }: { src: string }) => {
   const height = 1000;
   const scale = originalHeight / height;
 
+  const onSave = async () => {
+    if (!imageResult || !completedCrop) {
+      return;
+    }
+
+    const config = new Configuration({
+      basePath: '',
+    });
+    const api = new DefaultApi(config);
+    const ret = await api.androidSaveCropImageApiAndroidImageCropSavePut({
+      uuid: imageResult.uuid,
+      name: 'hogehoge',
+      x: completedCrop.x,
+      y: completedCrop.y,
+      width: completedCrop.width,
+      height: completedCrop.height,
+    });
+    console.log(ret);
+  };
+
   const handleMouseClick = (event : MouseEvent) => {
     const target = (event.target as HTMLButtonElement);
 
@@ -138,13 +175,21 @@ const ClickPoint = ({ src }: { src: string }) => {
         {snapShotMode && (
         <Box m="auto" display="flex">
           <Box m="auto" display="flex" pt={5}>
-            <ToggleButton
-              value="check"
-              selected={cropMode}
-              onChange={() => setCropMode(!cropMode)}
-            >
-              CROP MODE
-            </ToggleButton>
+            <Box p={2}>
+              <ToggleButton
+                value="check"
+                selected={cropMode}
+                onChange={() => setCropMode(!cropMode)}
+              >
+                CROP MODE
+              </ToggleButton>
+            </Box>
+
+            <Box p={2}>
+              <Button variant="contained" onClick={onSave}>
+                save
+              </Button>
+            </Box>
           </Box>
         </Box>
         ) }
@@ -172,7 +217,6 @@ const ClickPoint = ({ src }: { src: string }) => {
             height={height}
             handleMouseClick={handleMouseClick}
             cropMode={cropMode}
-            completedCrop={completedCrop}
             setCompletedCrop={setCompletedCrop}
             imageResult={imageResult}
             setImageResult={setImageResult}

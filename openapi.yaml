@@ -34,6 +34,59 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ImageResult'
+  /api/android/image/crop/save:
+    put:
+      summary: Android Save Crop Image
+      operationId: android_save_crop_image_api_android_image_crop_save_put
+      parameters:
+      - required: true
+        schema:
+          title: Uuid
+          type: string
+        name: uuid
+        in: query
+      - required: true
+        schema:
+          title: X
+          type: integer
+        name: x
+        in: query
+      - required: true
+        schema:
+          title: Y
+          type: integer
+        name: y
+        in: query
+      - required: true
+        schema:
+          title: Width
+          type: integer
+        name: width
+        in: query
+      - required: true
+        schema:
+          title: Height
+          type: integer
+        name: height
+        in: query
+      - required: true
+        schema:
+          title: Name
+          type: string
+        name: name
+        in: query
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
   /api/android/click:
     post:
       summary: Android Click
@@ -116,6 +169,8 @@ components:
       required:
       - base64
       - uuid
+      - width
+      - height
       type: object
       properties:
         base64:
@@ -124,6 +179,12 @@ components:
         uuid:
           title: Uuid
           type: string
+        width:
+          title: Width
+          type: integer
+        height:
+          title: Height
+          type: integer
     ValidationError:
       title: ValidationError
       required:

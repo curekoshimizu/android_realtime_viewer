@@ -34,6 +34,15 @@ export interface AndroidRunScriptApiAndroidScriptsScriptPostRequest {
     script: string;
 }
 
+export interface AndroidSaveCropImageApiAndroidImageCropSavePutRequest {
+    uuid: string;
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    name: string;
+}
+
 /**
  * 
  */
@@ -134,6 +143,80 @@ export class DefaultApi extends runtime.BaseAPI {
      */
     async androidRunScriptApiAndroidScriptsScriptPost(requestParameters: AndroidRunScriptApiAndroidScriptsScriptPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<any> {
         const response = await this.androidRunScriptApiAndroidScriptsScriptPostRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Android Save Crop Image
+     */
+    async androidSaveCropImageApiAndroidImageCropSavePutRaw(requestParameters: AndroidSaveCropImageApiAndroidImageCropSavePutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<any>> {
+        if (requestParameters.uuid === null || requestParameters.uuid === undefined) {
+            throw new runtime.RequiredError('uuid','Required parameter requestParameters.uuid was null or undefined when calling androidSaveCropImageApiAndroidImageCropSavePut.');
+        }
+
+        if (requestParameters.x === null || requestParameters.x === undefined) {
+            throw new runtime.RequiredError('x','Required parameter requestParameters.x was null or undefined when calling androidSaveCropImageApiAndroidImageCropSavePut.');
+        }
+
+        if (requestParameters.y === null || requestParameters.y === undefined) {
+            throw new runtime.RequiredError('y','Required parameter requestParameters.y was null or undefined when calling androidSaveCropImageApiAndroidImageCropSavePut.');
+        }
+
+        if (requestParameters.width === null || requestParameters.width === undefined) {
+            throw new runtime.RequiredError('width','Required parameter requestParameters.width was null or undefined when calling androidSaveCropImageApiAndroidImageCropSavePut.');
+        }
+
+        if (requestParameters.height === null || requestParameters.height === undefined) {
+            throw new runtime.RequiredError('height','Required parameter requestParameters.height was null or undefined when calling androidSaveCropImageApiAndroidImageCropSavePut.');
+        }
+
+        if (requestParameters.name === null || requestParameters.name === undefined) {
+            throw new runtime.RequiredError('name','Required parameter requestParameters.name was null or undefined when calling androidSaveCropImageApiAndroidImageCropSavePut.');
+        }
+
+        const queryParameters: any = {};
+
+        if (requestParameters.uuid !== undefined) {
+            queryParameters['uuid'] = requestParameters.uuid;
+        }
+
+        if (requestParameters.x !== undefined) {
+            queryParameters['x'] = requestParameters.x;
+        }
+
+        if (requestParameters.y !== undefined) {
+            queryParameters['y'] = requestParameters.y;
+        }
+
+        if (requestParameters.width !== undefined) {
+            queryParameters['width'] = requestParameters.width;
+        }
+
+        if (requestParameters.height !== undefined) {
+            queryParameters['height'] = requestParameters.height;
+        }
+
+        if (requestParameters.name !== undefined) {
+            queryParameters['name'] = requestParameters.name;
+        }
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/android/image/crop/save`,
+            method: 'PUT',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.TextApiResponse(response) as any;
+    }
+
+    /**
+     * Android Save Crop Image
+     */
+    async androidSaveCropImageApiAndroidImageCropSavePut(requestParameters: AndroidSaveCropImageApiAndroidImageCropSavePutRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<any> {
+        const response = await this.androidSaveCropImageApiAndroidImageCropSavePutRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

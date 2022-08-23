@@ -1,17 +1,22 @@
 import dataclasses
+import io
 import logging
+import pathlib
 import time
 from base64 import b64encode
 from typing import Iterator, Optional
 
 from fastapi import APIRouter, FastAPI
 from fastapi.staticfiles import StaticFiles
+from PIL import Image  # type: ignore
 from starlette.responses import StreamingResponse
 from starlette.routing import Route
 
 from .adb_helper import AdbHelper
 from .camera import AndroidCamera, CameraManager, DummyGamingCamera
 from .decode_script import DecodeScript
+
+saved_images_dir = pathlib.Path(__file__).parents[1] / "assets" / "saved_images"
 
 _logger = logging.getLogger(__name__)
 
@@ -26,7 +31,7 @@ async def video_feed() -> StreamingResponse:
         _logger.info("stream started!")
         try:
             for frame in camera.generate():
-                yield b"--frame\r\n" b"Content-Type: image/webp\r\n\r\n" + frame + b"\r\n"
+                yield b"--frame\r\n" b"Content-Type: image/webp\r\n\r\n" + frame.data + b"\r\n"
                 time.sleep(0.001)
         except Exception:
             _logger.exception("Exception Occured")
@@ -47,7 +52,7 @@ async def android_video_feed() -> StreamingResponse:
         _logger.info("stream started!")
         try:
             for frame in android_camera.generate():
-                yield b"--frame\r\n" b"Content-Type: image/webp\r\n\r\n" + frame + b"\r\n"
+                yield b"--frame\r\n" b"Content-Type: image/webp\r\n\r\n" + frame.data + b"\r\n"
                 time.sleep(0.001)
         except Exception:
             _logger.exception("Exception Occured")
@@ -61,14 +66,26 @@ async def android_video_feed() -> StreamingResponse:
 class ImageResult:
     base64: str
     uuid: str
+    width: int
+    height: int
 
 
 @router.get("/android/image", response_model=ImageResult)
 async def android_image() -> ImageResult:
-    uuid, ret = camera_manager.webp_frame()
-    assert ret is not None
-    base64 = b64encode(ret).decode("ascii")
-    return ImageResult(uuid=uuid, base64=base64)
+    uuid, frame = camera_manager.webp_frame()
+    assert frame is not None
+    base64 = b64encode(frame.data).decode("ascii")
+    return ImageResult(uuid=uuid, base64=base64, width=frame.width, height=frame.height)
+
+
+@router.put("/android/image/crop/save")
+async def android_save_crop_image(uuid: str, x: int, y: int, width: int, height: int, name: str) -> None:
+    frame = camera_manager.from_uuid(uuid)
+    assert frame is not None
+
+    with io.BytesIO(frame.data) as f:
+        with Image.open(f) as image:
+            image.crop((x, y, x + width, y + height)).save(saved_images_dir / f"{name}.png")
 
 
 @router.post("/android/click")

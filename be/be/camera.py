@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import dataclasses
 import io
 import subprocess
 import threading
@@ -11,9 +12,16 @@ from uuid import uuid4
 from PIL import Image  # type:ignore
 
 
+@dataclasses.dataclass
+class WebpResult:
+    data: bytes
+    height: int
+    width: int
+
+
 class Camera(ABC):
     @abstractmethod
-    def generate(self) -> Iterator[bytes]:
+    def generate(self) -> Iterator[WebpResult]:
         ...
 
 
@@ -36,12 +44,16 @@ class DummyGamingCamera(Camera):
             for i in range(256):
                 yield (255, 0, 255 - i)
 
-    def generate(self) -> Iterator[bytes]:
+    def generate(self) -> Iterator[WebpResult]:
         for r, g, b in self.color_generator():
             image = Image.new("RGBA", size=self._size, color=(r, g, b))
             with io.BytesIO() as frame:
                 image.save(frame, "webp")
-                yield frame.getvalue()
+                yield WebpResult(
+                    data=frame.getvalue(),
+                    width=image.width,
+                    height=image.height,
+                )
 
 
 class AndroidCamera(Camera):
@@ -57,7 +69,7 @@ class AndroidCamera(Camera):
         img_bytes = pipe.stdout.read()
         return Image.frombuffer("RGBA", (width, height), img_bytes[12:], "raw", "RGBX", 0, 1)
 
-    def generate(self) -> Iterator[bytes]:
+    def generate(self) -> Iterator[WebpResult]:
         while not self._stop_req:
             width = 1080
             height = 2340
@@ -65,7 +77,11 @@ class AndroidCamera(Camera):
                 image = self.screencap2pil(width, height)
                 with io.BytesIO() as frame:
                     image.save(frame, "webp")
-                    yield frame.getvalue()
+                    yield WebpResult(
+                        data=frame.getvalue(),
+                        width=image.width,
+                        height=image.height,
+                    )
             except Exception:
                 pass
             time.sleep(0.01)
@@ -77,12 +93,12 @@ class CameraManager(threading.Thread):
         self._camera = camera
         self._lock = threading.Lock()
         self._uuid: str = str(uuid4())
-        self._frame: Optional[bytes] = None
+        self._frame: Optional[WebpResult] = None
         self._stop_req = False
-        self._db: list[tuple[str, bytes]] = []
+        self._db: list[tuple[str, WebpResult]] = []
         self._threshold_len = 100
 
-    def webp_frame(self) -> tuple[str, Optional[bytes]]:
+    def webp_frame(self) -> tuple[str, Optional[WebpResult]]:
         with self._lock:
             frame = self._frame
             if frame is not None:
@@ -91,7 +107,7 @@ class CameraManager(threading.Thread):
                     self._db.pop(0)
             return (self._uuid, self._frame)
 
-    def from_uuid(self, uuid: str) -> Optional[bytes]:
+    def from_uuid(self, uuid: str) -> Optional[WebpResult]:
         for db_uuid, ret in self._db:
             if db_uuid == uuid:
                 return ret
