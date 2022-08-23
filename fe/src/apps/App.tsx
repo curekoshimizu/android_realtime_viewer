@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 import StyledAppBar from '../components/StyledAppBar';
 import ClickPointApp from '../pages/ClickPointApp';
+import ExampleCrop from '../pages/ExampleCrop';
 import NotFound from '../pages/NotFound';
 import ScriptApp from '../pages/ScriptApp';
 
@@ -19,6 +20,7 @@ const App = () => (
       <Routes>
         <Route path="/" element={<ClickPointApp />} />
         <Route path="/script" element={<ScriptApp />} />
+        <Route path="/example_crop" element={<ExampleCrop />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Container>

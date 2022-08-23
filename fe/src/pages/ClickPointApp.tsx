@@ -1,9 +1,14 @@
 import {
-  Grid, Box, Button, Typography,
+  Grid, Box, Button, Typography, ToggleButton,
 } from '@mui/material';
 import {
-  MouseEvent, useState,
+  MouseEvent, useState, useRef,
+  SetStateAction, Dispatch,
 } from 'react';
+import ReactCrop, {
+  Crop,
+  PixelCrop,
+} from 'react-image-crop';
 import { useAsyncEffect } from 'use-async-effect';
 
 import { DefaultApi, Configuration, ImageResult } from '../client';
@@ -12,10 +17,26 @@ import { BoldDiv, BoldSpan } from '../components/BoldBox';
 interface SnapShotImgProp {
   handleMouseClick: (event: MouseEvent) => void;
   height: number;
+  cropMode: boolean;
+  completedCrop?: PixelCrop,
+  setCompletedCrop:Dispatch<SetStateAction< PixelCrop | undefined>>,
+  imageResult?: ImageResult,
+  setImageResult: Dispatch<SetStateAction< ImageResult | undefined>>,
 }
 
-const SnapShotImg = ({ height, handleMouseClick }: SnapShotImgProp) => {
-  const [imageResult, setImageResult] = useState<ImageResult>();
+const SnapShotImg = ({
+  height,
+  handleMouseClick,
+  cropMode,
+  completedCrop,
+  setCompletedCrop,
+  imageResult,
+  setImageResult,
+}: SnapShotImgProp) => {
+  const imgRef = useRef<HTMLImageElement>(null);
+  const [crop, setCrop] = useState<Crop>(completedCrop || {
+    x: 10, y: 10, width: 80, height: 80, unit: '%',
+  });
 
   useAsyncEffect(async () => {
     const config = new Configuration({
@@ -26,17 +47,36 @@ const SnapShotImg = ({ height, handleMouseClick }: SnapShotImgProp) => {
     setImageResult(ret);
   }, []);
 
-  return (
-    <div>
-      { imageResult && (
+  if (!imageResult) {
+    return (<div />);
+  }
+
+  if (cropMode) {
+    return (
+      <ReactCrop
+        crop={crop}
+        keepSelection
+        onChange={(c) => setCrop(c)}
+        onComplete={(c) => setCompletedCrop(c)}
+      >
         <img
+          ref={imgRef}
           height={height}
           src={`data:image/webp;base64,${imageResult.base64}`}
-          onClick={handleMouseClick}
           alt="captured_image"
         />
-      ) }
-    </div>
+        <div>{completedCrop?.x}</div>
+      </ReactCrop>
+    );
+  }
+
+  return (
+    <img
+      height={height}
+      src={`data:image/webp;base64,${imageResult.base64}`}
+      onClick={handleMouseClick}
+      alt="captured_image"
+    />
   );
 };
 
@@ -62,7 +102,10 @@ interface Point {
 }
 
 const ClickPoint = ({ src }: { src: string }) => {
+  const [imageResult, setImageResult] = useState<ImageResult >();
   const [snapShotMode, setSnapShotMode] = useState<boolean>(false);
+  const [cropMode, setCropMode] = useState<boolean>(false);
+  const [completedCrop, setCompletedCrop] = useState<PixelCrop>();
   const [point, setPoint] = useState<Point | null>(null);
   const originalHeight = 2340;
   const height = 1000;
@@ -92,6 +135,19 @@ const ClickPoint = ({ src }: { src: string }) => {
             </BoldDiv>
           </Typography>
         </Box>
+        {snapShotMode && (
+        <Box m="auto" display="flex">
+          <Box m="auto" display="flex" pt={5}>
+            <ToggleButton
+              value="check"
+              selected={cropMode}
+              onChange={() => setCropMode(!cropMode)}
+            >
+              CROP MODE
+            </ToggleButton>
+          </Box>
+        </Box>
+        ) }
         <Box
           m="auto"
           display="flex"
@@ -112,7 +168,15 @@ const ClickPoint = ({ src }: { src: string }) => {
           justifyContent="center"
         >
           { snapShotMode && (
-            <SnapShotImg height={height} handleMouseClick={handleMouseClick} />
+          <SnapShotImg
+            height={height}
+            handleMouseClick={handleMouseClick}
+            cropMode={cropMode}
+            completedCrop={completedCrop}
+            setCompletedCrop={setCompletedCrop}
+            imageResult={imageResult}
+            setImageResult={setImageResult}
+          />
           )}
           { !snapShotMode && (
           <Video src={src} height={height} handleMouseClick={handleMouseClick} />
