@@ -1,5 +1,7 @@
+import dataclasses
 import logging
 import time
+from base64 import b64encode
 from typing import Iterator, Optional
 
 from fastapi import APIRouter, FastAPI
@@ -8,7 +10,7 @@ from starlette.responses import StreamingResponse
 from starlette.routing import Route
 
 from .adb_helper import AdbHelper
-from .camera import AndroidCamera, DummyGamingCamera
+from .camera import AndroidCamera, CameraManager, DummyGamingCamera
 from .decode_script import DecodeScript
 
 _logger = logging.getLogger(__name__)
@@ -34,14 +36,17 @@ async def video_feed() -> StreamingResponse:
     return StreamingResponse(stream(), media_type="multipart/x-mixed-replace; boundary=frame")
 
 
+android_camera = AndroidCamera()
+camera_manager = CameraManager(android_camera)
+camera_manager.start()
+
+
 @router.get("/android/video")
 async def android_video_feed() -> StreamingResponse:
-    camera = AndroidCamera()
-
     def stream() -> Iterator[bytes]:
         _logger.info("stream started!")
         try:
-            for frame in camera.generate():
+            for frame in android_camera.generate():
                 yield b"--frame\r\n" b"Content-Type: image/webp\r\n\r\n" + frame + b"\r\n"
                 time.sleep(0.001)
         except Exception:
@@ -50,6 +55,20 @@ async def android_video_feed() -> StreamingResponse:
             _logger.info("stream has done.")
 
     return StreamingResponse(stream(), media_type="multipart/x-mixed-replace; boundary=frame")
+
+
+@dataclasses.dataclass
+class ImageResult:
+    base64: str
+    uuid: str
+
+
+@router.get("/android/image", response_model=ImageResult)
+async def android_image() -> ImageResult:
+    uuid, ret = camera_manager.webp_frame()
+    assert ret is not None
+    base64 = b64encode(ret).decode("ascii")
+    return ImageResult(uuid=uuid, base64=base64)
 
 
 @router.post("/android/click")
@@ -90,3 +109,8 @@ def setup_app(
 
     if static_dir is not None:
         app.mount("/", StaticFiles(directory=static_dir, html=True), name="static")
+
+
+def stop() -> None:
+    camera_manager.stop()
+    android_camera.stop()

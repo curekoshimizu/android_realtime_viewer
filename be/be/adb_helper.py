@@ -1,6 +1,6 @@
+import pathlib
 import subprocess
 import time
-import pathlib
 
 from PIL import Image  # type:ignore
 

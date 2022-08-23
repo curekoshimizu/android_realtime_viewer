@@ -5,7 +5,7 @@ import pathlib
 import click
 import uvicorn  # type:ignore
 
-from be.app import app, setup_app
+from be.app import app, setup_app, stop
 
 
 @click.command()
@@ -31,4 +31,7 @@ def main(port: int, reload: bool, docs: bool, static: str) -> None:
 
 
 if __name__ in "__main__":
-    main()
+    try:
+        main()
+    finally:
+        stop()

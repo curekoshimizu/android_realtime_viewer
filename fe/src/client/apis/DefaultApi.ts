@@ -16,10 +16,13 @@
 import * as runtime from '../runtime';
 import type {
   HTTPValidationError,
+  ImageResult,
 } from '../models';
 import {
     HTTPValidationErrorFromJSON,
     HTTPValidationErrorToJSON,
+    ImageResultFromJSON,
+    ImageResultToJSON,
 } from '../models';
 
 export interface AndroidClickApiAndroidClickPostRequest {
@@ -75,6 +78,32 @@ export class DefaultApi extends runtime.BaseAPI {
      */
     async androidClickApiAndroidClickPost(requestParameters: AndroidClickApiAndroidClickPostRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<any> {
         const response = await this.androidClickApiAndroidClickPostRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Android Image
+     */
+    async androidImageApiAndroidImageGetRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<ImageResult>> {
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+        const response = await this.request({
+            path: `/api/android/image`,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        }, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => ImageResultFromJSON(jsonValue));
+    }
+
+    /**
+     * Android Image
+     */
+    async androidImageApiAndroidImageGet(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<ImageResult> {
+        const response = await this.androidImageApiAndroidImageGetRaw(initOverrides);
         return await response.value();
     }
 

@@ -23,6 +23,17 @@ paths:
           content:
             application/json:
               schema: {}
+  /api/android/image:
+    get:
+      summary: Android Image
+      operationId: android_image_api_android_image_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImageResult'
   /api/android/click:
     post:
       summary: Android Click
@@ -100,6 +111,19 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ValidationError'
+    ImageResult:
+      title: ImageResult
+      required:
+      - base64
+      - uuid
+      type: object
+      properties:
+        base64:
+          title: Base64
+          type: string
+        uuid:
+          title: Uuid
+          type: string
     ValidationError:
       title: ValidationError
       required:

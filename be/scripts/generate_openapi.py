@@ -4,7 +4,7 @@ import pathlib
 
 import yaml
 
-from be.app import app, setup_app
+from be.app import app, setup_app, stop
 
 root_path = pathlib.Path(__file__).resolve().parents[2]
 
@@ -16,4 +16,7 @@ def main() -> None:
 
 
 if __name__ in "__main__":
-    main()
+    try:
+        main()
+    finally:
+        stop()
