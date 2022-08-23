@@ -7,6 +7,7 @@ import {
 import { useAsyncEffect } from 'use-async-effect';
 
 import { DefaultApi, Configuration, ImageResult } from '../client';
+import { BoldDiv, BoldSpan } from '../components/BoldBox';
 
 interface SnapShotImgProp {
   handleMouseClick: (event: MouseEvent) => void;
@@ -78,24 +79,34 @@ const ClickPoint = ({ src }: { src: string }) => {
 
   return (
     <Grid container>
-      <Grid item xs={3}>
-        <Button variant="contained" onClick={() => setSnapShotMode(!snapShotMode)}>
-          {(snapShotMode) ? 'VIDEO' : 'SNAPSHOT'}
-        </Button>
+      <Grid item xs={4}>
+        <Box m="auto" display="flex">
+          <Box m="auto" display="flex" pt={5}>
+            <Button variant="contained" onClick={() => setSnapShotMode(!snapShotMode)}>
+              {(snapShotMode) ? 'REALTIME VIDEO' : 'SNAPSHOT'}
+            </Button>
+          </Box>
+          <Typography variant="h6" pt={5}>
+            <BoldDiv>
+              {(snapShotMode) ? 'SNAPSHOT MODE' : 'REALTIME VIDEO MODE'}
+            </BoldDiv>
+          </Typography>
+        </Box>
         <Box
           m="auto"
           display="flex"
         >
           {
           point && (
-            <Typography variant="h6">
-                {`click point : (${Math.round(point.x * scale)}, ${Math.round(point.y * scale)})`}
+            <Typography variant="h6" pt={10}>
+              <BoldSpan>click point : </BoldSpan>
+              <BoldSpan>{`(${Math.round(point.x * scale)}, ${Math.round(point.y * scale)})`}</BoldSpan>
             </Typography>
           )
       }
         </Box>
       </Grid>
-      <Grid item xs={9}>
+      <Grid item xs={8}>
         <Box
           display="flex"
           justifyContent="center"
