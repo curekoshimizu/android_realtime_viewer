@@ -9,7 +9,7 @@ from be.app import app, setup_app, stop
 
 
 @click.command()
-@click.option("--port", default=8080, help="port number")
+@click.option("--port", default=8888, help="port number")
 @click.option("--reload", is_flag=True, help="enable hot reload")
 @click.option("--docs", is_flag=True, help="enable documents")
 @click.option("--static", default="../fe/dist", help="static files built by fe dir")
