@@ -1,10 +1,16 @@
 import datetime
+import time
 import pathlib
+from PIL import ImageChops
 from tokenize import ENCODING, ENDMARKER, NAME, NEWLINE, NL, NUMBER, OP, STRING, TokenInfo, tokenize
+
+import numpy as np
+from PIL import Image  # type: ignore
 
 from .adb_helper import AdbHelper
 
 shortcuts_dir = pathlib.Path(__file__).parents[1] / "assets" / "shortcuts"
+saved_images_dir = pathlib.Path(__file__).parents[1] / "assets" / "saved_images"
 
 
 class DecodeScript:
@@ -70,6 +76,8 @@ class DecodeScript:
                     self._text(args)
                 elif operation_name == "screenshot":
                     self._screenshot(args)
+                elif operation_name == "wait_until_exactly_detected":
+                    self._wait_until_exactly_detected(args)
                 else:
                     self._call_script(operation_name, args)
             else:
@@ -120,3 +128,40 @@ class DecodeScript:
     def _call_script(self, script_name: str, args: list[TokenInfo]) -> None:
         assert len(args) == 0
         self.run(script_name)
+
+    def _detected(self, image1: Image.Image, image2: Image.Image) -> bool:
+        assert image1.size == image2.size
+        diff = ImageChops.difference(image1, image2)
+        return diff.getbbox() is None
+
+    def _wait_until_exactly_detected(self, args: list[TokenInfo]) -> None:
+        assert len(args) == 7
+        assert args[0].type == STRING
+        assert args[1].type == NUMBER
+        assert args[2].type == NUMBER
+        assert args[3].type == NUMBER
+        assert args[4].type == NUMBER
+        assert args[5].type == STRING
+        assert args[6].type == NUMBER
+
+        maximum_time = int(args[6].string)
+
+        original_image = saved_images_dir / f"{eval(args[0].string)}.png"
+        with Image.open(original_image) as origin:
+            x = int(args[1].string)
+            y = int(args[2].string)
+            width = int(args[3].string)
+            height = int(args[4].string)
+
+            stime = time.time()
+            while True:
+                image = self._adb.current_screen()
+                image = image.crop((x, y, x + width, y + height))
+                image = image.convert(origin.mode)
+
+                self._detected(image, origin)
+                if time.time() - stime > maximum_time:
+                    break
+                time.sleep(0.01)
+
+        print("success : ", args[5].string)

@@ -14,9 +14,7 @@ from starlette.routing import Route
 
 from .adb_helper import AdbHelper
 from .camera import AndroidCamera, CameraManager, DummyGamingCamera
-from .decode_script import DecodeScript
-
-saved_images_dir = pathlib.Path(__file__).parents[1] / "assets" / "saved_images"
+from .decode_script import DecodeScript, saved_images_dir
 
 _logger = logging.getLogger(__name__)
 
@@ -31,7 +29,7 @@ async def video_feed() -> StreamingResponse:
         _logger.info("stream started!")
         try:
             for frame in camera.generate():
-                yield b"--frame\r\n" b"Content-Type: image/webp\r\n\r\n" + frame.data + b"\r\n"
+                yield b"--frame\r\n" b"Content-Type: image/webp\r\n\r\n" + frame.webp_data + b"\r\n"
                 time.sleep(0.001)
         except Exception:
             _logger.exception("Exception Occured")
@@ -52,7 +50,7 @@ async def android_video_feed() -> StreamingResponse:
         _logger.info("stream started!")
         try:
             for frame in android_camera.generate():
-                yield b"--frame\r\n" b"Content-Type: image/webp\r\n\r\n" + frame.data + b"\r\n"
+                yield b"--frame\r\n" b"Content-Type: image/webp\r\n\r\n" + frame.webp_data + b"\r\n"
                 time.sleep(0.001)
         except Exception:
             _logger.exception("Exception Occured")
@@ -74,7 +72,7 @@ class ImageResult:
 async def android_image() -> ImageResult:
     uuid, frame = camera_manager.webp_frame()
     assert frame is not None
-    base64 = b64encode(frame.data).decode("ascii")
+    base64 = b64encode(frame.webp_data).decode("ascii")
     return ImageResult(uuid=uuid, base64=base64, width=frame.width, height=frame.height)
 
 
@@ -83,9 +81,7 @@ async def android_save_crop_image(uuid: str, x: int, y: int, width: int, height:
     frame = camera_manager.from_uuid(uuid)
     assert frame is not None
 
-    with io.BytesIO(frame.data) as f:
-        with Image.open(f) as image:
-            image.crop((x, y, x + width, y + height)).save(saved_images_dir / f"{name}.png")
+    frame.raw_image.crop((x, y, x + width, y + height)).convert("RGB").save(saved_images_dir / f"{name}.png")
 
 
 @router.post("/android/click")
