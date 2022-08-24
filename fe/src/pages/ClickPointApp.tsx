@@ -1,5 +1,6 @@
 import {
   Grid, Box, Button, Typography, ToggleButton,
+  TextField,
 } from '@mui/material';
 import {
   MouseEvent, useState, useRef,
@@ -124,10 +125,12 @@ const ClickPoint = ({ src }: { src: string }) => {
   const [cropMode, setCropMode] = useState<boolean>(false);
   const [completedCrop, setCompletedCrop] = useState<PixelCrop>();
   const [point, setPoint] = useState<Point | null>(null);
+  const [imageName, setImageName] = useState<string>('');
   const originalHeight = 2340;
   const height = 1000;
   const scale = originalHeight / height;
 
+  const preSave = imageResult && completedCrop;
   const onSave = async () => {
     if (!imageResult || !completedCrop) {
       return;
@@ -137,15 +140,18 @@ const ClickPoint = ({ src }: { src: string }) => {
       basePath: '',
     });
     const api = new DefaultApi(config);
-    const ret = await api.androidSaveCropImageApiAndroidImageCropSavePut({
-      uuid: imageResult.uuid,
-      name: 'hogehoge',
-      x: completedCrop.x,
-      y: completedCrop.y,
-      width: completedCrop.width,
-      height: completedCrop.height,
-    });
-    console.log(ret);
+    try {
+      await api.androidSaveCropImageApiAndroidImageCropSavePut({
+        uuid: imageResult.uuid,
+        name: imageName,
+        x: completedCrop.x,
+        y: completedCrop.y,
+        width: completedCrop.width,
+        height: completedCrop.height,
+      });
+    } catch (e: unknown) {
+      alert('save image failed...'); // eslint-disable-line no-alert
+    }
   };
 
   const handleMouseClick = (event : MouseEvent) => {
@@ -185,14 +191,31 @@ const ClickPoint = ({ src }: { src: string }) => {
               </ToggleButton>
             </Box>
 
+            { preSave && imageName.length > 0 && (
             <Box p={2}>
               <Button variant="contained" onClick={onSave}>
                 save
               </Button>
             </Box>
+            )}
           </Box>
         </Box>
         ) }
+        {
+            preSave && (
+            <Box pt={2}>
+              <Typography variant="h6" pt={5}>
+                <BoldDiv>boundary : </BoldDiv>
+                <BoldDiv>{`(x, y) = (${completedCrop.x}, ${completedCrop.y})`}</BoldDiv>
+                <BoldDiv>{`(w, h) = (${completedCrop.width}, ${completedCrop.height})`}</BoldDiv>
+              </Typography>
+              <Typography variant="h6" pt={5}>
+                <BoldDiv>Name : </BoldDiv>
+                <TextField value={imageName} onChange={(e) => setImageName(e.target.value)} />
+              </Typography>
+            </Box>
+            )
+        }
         <Box
           m="auto"
           display="flex"
