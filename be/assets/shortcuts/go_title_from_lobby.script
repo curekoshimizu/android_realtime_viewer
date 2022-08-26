@@ -1,5 +1,18 @@
-click(1009, 250)
+click(1051, 250)
 sleep(1000)
 swipe(545, 1140, 0, -100)
 sleep(1000)
 click(290, 1874)
+
+
+wait_until_detected("BLUE_SKY")
+click(100, 100)
+print("blue sky")
+
+wait_until_detected("CYGAMES")
+click(100, 100)
+print("Cygames")
+
+
+wait_until_detected("CRIWARE")
+print("HOME画面検出完了")

@@ -1,10 +1,88 @@
-wait_until_exactly_detected("CRIWARE", 53, 2231, 70, 70, "HOME画面検出完了", 10)
-click(994, 2270)
-wait_until_exactly_detected("DELETE_USER_TEXT", 63, 1750, 944, 166, "ユーザー削除検出完了", 10)
-click(550, 1825)
-wait_until_exactly_detected("REMOVE_USER_DATA", 589, 1492, 386, 74, "ユーザーデータ削除ボタン検出完了", 10)
-click(772, 1533)
-wait_until_exactly_detected("REMOVE_USER_DATA", 589, 1492, 386, 74, "ユーザーデータ削除ボタン検出完了", 10)
-click(772, 1533)
+wait_until_detected("CRIWARE")
+print("HOME画面検出完了")
+click(560, 1715)
+
+wait_until_detected("AGREE_BUTTON")
+click(768, 2052)
+print("同意する")
+sleep(1000)
+
+wait_until_detected("AGREE_BUTTON")
+click(768, 2052)
+print("同意する2")
+
+
+wait_until_detected("OK_BUTTON")
+click(300, 1550)
+print("Google Playへのサインイン cancel")
+
+wait_until_detected("LATER_BUTTON")
+click(300, 1550)
+print("アカウント連携設定のお願い cancel")
+
+wait_until_detected("LATER_BUTTON")
+click(300, 1550)
+print("アカウント連携設定のお願い cancel")
+
+wait_until_detected("TUTORIAL_SKIP_BUTTON")
+click(770, 1559)
+print("チュートリアル skip")
+
+
+wait_until_detected("INPUT_NAME")
+click(600, 1156)
+print("form")
 sleep(500)
-click(50, 50)
+
+click(136, 2101)
+sleep(500)
+text("shugolaris")
+click(934, 1123)
+sleep(500)
+click(529, 1547)
+print("registered")
+
+wait_until_detected("REGISTER_DIALOG")
+print("press ok")
+click(775, 1516)
+
+wait_until_detected("SKIP_SKIP_BUTTON")
+click(997, 2246)
+print("skip1 done")
+sleep(1000)
+
+wait_until_detected("SKIP_SKIP_BUTTON")
+click(997, 2246)
+print("skip2 done")
+sleep(1000)
+
+wait_until_detected("SKIP_SKIP_BUTTON")
+click(997, 2246)
+print("skip3 done")
+sleep(1000)
+
+wait_until_detected("SKIP_SKIP_BUTTON")
+click(997, 2246)
+print("skip4 done")
+sleep(1000)
+
+wait_until_detected("SKIP_SKIP_BUTTON")
+click(997, 2246)
+print("skip5 done")
+sleep(1000)
+
+
+wait_until_detected("SKIP_SKIP_BUTTON")
+click(997, 2246)
+print("skip6 done")
+sleep(1000)
+
+wait_until_detected("SKIP_SKIP_BUTTON")
+click(997, 2246)
+print("skip7 done")
+sleep(1000)
+
+wait_until_detected("SKIP_SKIP_BUTTON")
+click(997, 2246)
+print("skip8 done")
+sleep(1000)

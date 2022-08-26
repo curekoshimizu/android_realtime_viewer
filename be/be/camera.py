@@ -51,6 +51,7 @@ class DummyGamingCamera(Camera):
             with io.BytesIO() as frame:
                 image.save(frame, "webp")
                 yield CapturedResult(
+                    raw_image=image,
                     data=frame.getvalue(),
                     width=image.width,
                     height=image.height,

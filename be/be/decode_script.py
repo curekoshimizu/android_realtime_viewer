@@ -1,21 +1,25 @@
 import datetime
-import time
 import pathlib
-from PIL import ImageChops
-from tokenize import ENCODING, ENDMARKER, NAME, NEWLINE, NL, NUMBER, OP, STRING, TokenInfo, tokenize
-
 import numpy as np
+import json
+import time
+from tokenize import ENCODING, ENDMARKER, NAME, NEWLINE, NL, NUMBER, OP, STRING, TokenInfo, tokenize
+from typing import Optional
+
 from PIL import Image  # type: ignore
+from PIL import ImageChops
 
 from .adb_helper import AdbHelper
+from .camera import CameraManager
 
 shortcuts_dir = pathlib.Path(__file__).parents[1] / "assets" / "shortcuts"
 saved_images_dir = pathlib.Path(__file__).parents[1] / "assets" / "saved_images"
 
 
 class DecodeScript:
-    def __init__(self, adb: AdbHelper) -> None:
+    def __init__(self, adb: AdbHelper, camera_manager: Optional[CameraManager] = None) -> None:
         self._adb = adb
+        self._camera_manager = camera_manager
 
     def scripts(self) -> list[str]:
         assert shortcuts_dir.exists(), shortcuts_dir
@@ -76,8 +80,10 @@ class DecodeScript:
                     self._text(args)
                 elif operation_name == "screenshot":
                     self._screenshot(args)
-                elif operation_name == "wait_until_exactly_detected":
-                    self._wait_until_exactly_detected(args)
+                elif operation_name == "wait_until_detected":
+                    self._wait_until_detected(args)
+                elif operation_name == "print":
+                    self._print(args)
                 else:
                     self._call_script(operation_name, args)
             else:
@@ -129,39 +135,46 @@ class DecodeScript:
         assert len(args) == 0
         self.run(script_name)
 
-    def _detected(self, image1: Image.Image, image2: Image.Image) -> bool:
+    def _detected(self, image1: Image.Image, image2: Image.Image, threshold: int = 5) -> bool:
         assert image1.size == image2.size
-        diff = ImageChops.difference(image1, image2)
-        return diff.getbbox() is None
+        x = np.array(image1).astype(np.int16).flatten()
+        y = np.array(image2).astype(np.int16).flatten()
+        diff = np.absolute(x - y)
+        ret = (diff < threshold).sum() == len(x)
+        return ret
 
-    def _wait_until_exactly_detected(self, args: list[TokenInfo]) -> None:
-        assert len(args) == 7
+    def _print(self, args: list[TokenInfo]) -> None:
+        assert len(args) == 1
         assert args[0].type == STRING
-        assert args[1].type == NUMBER
-        assert args[2].type == NUMBER
-        assert args[3].type == NUMBER
-        assert args[4].type == NUMBER
-        assert args[5].type == STRING
-        assert args[6].type == NUMBER
+        print(args[0].string)
 
-        maximum_time = int(args[6].string)
+    def _wait_until_detected(self, args: list[TokenInfo], maximum_time: int = 10) -> None:
+        assert len(args) == 1
+        assert args[0].type == STRING
 
-        original_image = saved_images_dir / f"{eval(args[0].string)}.png"
+        with open(saved_images_dir / f"{eval(args[0].string)}.json") as f:
+            data = json.load(f)
+
+        original_image = saved_images_dir / data["image"]
         with Image.open(original_image) as origin:
-            x = int(args[1].string)
-            y = int(args[2].string)
-            width = int(args[3].string)
-            height = int(args[4].string)
+            origin = origin.convert("L")
+            x = data["x"]
+            y = data["y"]
+            width = origin.width
+            height = origin.height
 
             stime = time.time()
             while True:
-                image = self._adb.current_screen()
+                assert self._camera_manager is not None
+                _, frame = self._camera_manager.webp_frame()
+                assert frame is not None
+                image = frame.raw_image
                 image = image.crop((x, y, x + width, y + height))
                 image = image.convert(origin.mode)
-
-                self._detected(image, origin)
-                if time.time() - stime > maximum_time:
+                if self._detected(image, origin):
                     break
+                if time.time() - stime > maximum_time:
+                    image.save("debug_screen_image.png")
+                    import ipdb; ipdb.set_trace()
+                    raise TimeoutError()
                 time.sleep(0.01)
-
-        print("success : ", args[5].string)

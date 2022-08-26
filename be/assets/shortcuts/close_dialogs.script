@@ -1,0 +1,23 @@
+wait_until_detected("CLOSE_DIALOG1")
+click(531, 2059)
+print("初回dialog close")
+
+
+wait_until_detected("CLOSE_DIALOG2")
+click(297, 1535)
+print("ガチャストップ通知 close")
+
+
+wait_until_detected("CLOSE_DIALOG1")
+click(531, 2059)
+print("ストーリー解放 close")
+
+
+wait_until_detected("CLOSE_DIALOG3")
+click(529, 1528)
+print("メインストーリー解放 close")
+
+
+wait_until_detected("CLOSE_DIALOG1")
+click(531, 2059)
+print("ウマ娘ストーリー close")

@@ -1,9 +1,33 @@
-click(1013, 2270)
+wait_until_detected("CRIWARE")
+print("HOME画面検出完了")
+click(994, 2270)
+
+wait_until_detected("DELETE_USER_TEXT")
+click(500, 1816)
+print("ユーザーデータ削除 選択")
+
+wait_until_detected("DELETE_BUTTON")
+click(746, 1535)
+print("ユーザーデータ削除")
 sleep(500)
-click(541, 1832)
-sleep(500)
-click(791, 1530)
-sleep(500)
-click(791, 1530)
-sleep(500)
-click(543, 1528)
+
+wait_until_detected("DELETE_BUTTON")
+click(746, 1535)
+print("確認OK")
+
+wait_until_detected("DELETE_FINISHED_TEXT")
+click(746, 1535)
+print("DONE.")
+
+
+wait_until_detected("BLUE_SKY")
+click(100, 100)
+print("blue sky")
+
+wait_until_detected("CYGAMES")
+click(100, 100)
+print("Cygames")
+
+
+wait_until_detected("CRIWARE")
+print("HOME画面検出完了")

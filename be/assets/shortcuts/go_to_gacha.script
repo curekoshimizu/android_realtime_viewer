@@ -1,4 +1,9 @@
 click(945, 2260)
 sleep(1500)
-click(915, 1989)
+
+click(1004, 1568)
+sleep(1000)
+click(1004, 1568)
+sleep(1000)
+click(1004, 1568)
 sleep(1000)
