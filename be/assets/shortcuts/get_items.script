@@ -1,3 +1,4 @@
+sleep(1000)
 click(985, 1781)
 sleep(1000)
 click(721, 2022)

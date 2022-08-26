@@ -135,7 +135,7 @@ class DecodeScript:
         assert len(args) == 0
         self.run(script_name)
 
-    def _detected(self, image1: Image.Image, image2: Image.Image, threshold: int = 5) -> bool:
+    def _detected(self, image1: Image.Image, image2: Image.Image, threshold: int = 10) -> bool:
         assert image1.size == image2.size
         x = np.array(image1).astype(np.int16).flatten()
         y = np.array(image2).astype(np.int16).flatten()
