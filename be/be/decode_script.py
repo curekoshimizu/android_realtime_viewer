@@ -204,6 +204,7 @@ class DecodeScript:
                     return True
                 if time.time() - stime > maximum_time:
                     if timeout_error:
+                        print("error", args)
                         image.save("debug_screen_image.png")
                         import ipdb; ipdb.set_trace()
                         raise TimeoutError()
