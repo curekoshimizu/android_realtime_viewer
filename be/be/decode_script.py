@@ -82,6 +82,10 @@ class DecodeScript:
                     self._screenshot(args)
                 elif operation_name == "wait_until_detected":
                     self._wait_until_detected(args)
+                elif operation_name == "on_detect":
+                    self._on_detect(args)
+                elif operation_name == "repeat":
+                    self._repeat(args)
                 elif operation_name == "print":
                     self._print(args)
                 else:
@@ -148,7 +152,32 @@ class DecodeScript:
         assert args[0].type == STRING
         print(args[0].string)
 
-    def _wait_until_detected(self, args: list[TokenInfo], maximum_time: int = 10) -> None:
+    def _repeat(self, args: list[TokenInfo]) -> None:
+        assert len(args) >= 3
+
+        duration = int(args[0].string)
+        stime = time.time()
+        while time.time() - stime < duration:
+            if args[2].string == "click":
+                self._click(args[3:])
+            else:
+                raise NotImplementedError
+            self._sleep([args[1]])
+
+    def _on_detect(self, args: list[TokenInfo]) -> None:
+        assert len(args) >= 4
+        maximum_time = int(args[1].string)
+
+        ret =self._wait_until_detected([args[0]], maximum_time=maximum_time, timeout_error=False)
+        if ret:
+            if args[3].string == "click":
+                self._click(args[4:])
+            else:
+                raise NotImplementedError
+            print(args[2].string)
+
+
+    def _wait_until_detected(self, args: list[TokenInfo], maximum_time: int = 10, timeout_error: bool = True) -> bool:
         assert len(args) == 1
         assert args[0].type == STRING
 
@@ -172,9 +201,12 @@ class DecodeScript:
                 image = image.crop((x, y, x + width, y + height))
                 image = image.convert(origin.mode)
                 if self._detected(image, origin):
-                    break
+                    return True
                 if time.time() - stime > maximum_time:
-                    image.save("debug_screen_image.png")
-                    import ipdb; ipdb.set_trace()
-                    raise TimeoutError()
+                    if timeout_error:
+                        image.save("debug_screen_image.png")
+                        import ipdb; ipdb.set_trace()
+                        raise TimeoutError()
+                    else:
+                        return False
                 time.sleep(0.01)

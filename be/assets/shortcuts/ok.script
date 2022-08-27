@@ -1,7 +1,6 @@
+go_title_from_lobby()
 delete_account()
 auto_go_to_lobby()
 close_dialogs()
 get_items()
 password()
-go_to_gacha()
-

@@ -1,0 +1,49 @@
+wait_until_detected("GACHA_START_BUTTON")
+print("gacha start")
+click(889, 1914)
+
+
+print("!!! 1 回目 !!!")
+wait_until_detected("GACHA_START_BUTTON2")
+click(777, 1535)
+print("ガチャを引く!") 
+repeat(10, 500, click , 997, 2239)
+screenshot()
+wait_until_detected("TRY_GACHA_AGAIN") 
+click(765, 2073)
+print("もう一度引く")
+
+
+print("!!! 2 回目 !!!")
+wait_until_detected("GACHA_START_BUTTON2")
+click(777, 1535)
+print("ガチャを引く!") 
+repeat(10, 500, click , 997, 2239)
+screenshot()
+wait_until_detected("TRY_GACHA_AGAIN") 
+click(765, 2073)
+print("もう一度引く")
+
+
+print("!!! 3 回目 !!!")
+wait_until_detected("GACHA_START_BUTTON2")
+click(777, 1535)
+print("ガチャを引く!") 
+repeat(10, 500, click , 997, 2239)
+screenshot()
+wait_until_detected("TRY_GACHA_AGAIN") 
+click(765, 2073)
+print("もう一度引く")
+
+
+print("!!! 4 回目 !!!")
+wait_until_detected("GACHA_START_BUTTON2")
+click(777, 1535)
+print("ガチャを引く!") 
+repeat(10, 500, click , 997, 2239)
+screenshot()
+wait_until_detected("TRY_GACHA_AGAIN") 
+click(765, 2073)
+print("もう一度引く")
+
+

@@ -71,7 +71,6 @@ click(997, 2246)
 print("skip5 done")
 sleep(1500)
 
-
 wait_until_detected("SKIP_SKIP_BUTTON")
 click(997, 2246)
 print("skip6 done")
@@ -80,3 +79,6 @@ sleep(1500)
 wait_until_detected("SKIP_SKIP_BUTTON")
 click(997, 2246)
 print("skip7 done")
+sleep(1500)
+
+on_detect("SKIP_SKIP_BUTTON", 5, "skip8 done", click, 997, 2246)
