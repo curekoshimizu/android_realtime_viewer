@@ -5,7 +5,7 @@ close_dialogs()
 get_items()
 password()
 
-sleep(1000)
+sleep(10000)
 wait_until_detected("TEAM_RANK_F")
 print("TEAM RANK F発見. ロビーと確認. 障害ダイアログなどなし")
 

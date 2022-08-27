@@ -88,6 +88,8 @@ class DecodeScript:
                     self._repeat(args)
                 elif operation_name == "print":
                     self._print(args)
+                elif operation_name == "while":
+                    self._while(args)
                 else:
                     self._call_script(operation_name, args)
             else:
@@ -151,6 +153,18 @@ class DecodeScript:
         assert len(args) == 1
         assert args[0].type == STRING
         print(args[0].string)
+
+    def _while(self, args: list[TokenInfo]) -> None:
+        assert len(args) > 0
+        assert args[0].type == NAME
+        script_name = args[0].string
+
+        count = 0
+        while True:
+            print(f"[while {count} 回目]")
+            self._call_script(script_name, args[1:])
+            count += 1
+            time.sleep(0.01)
 
     def _repeat(self, args: list[TokenInfo]) -> None:
         assert len(args) >= 3
