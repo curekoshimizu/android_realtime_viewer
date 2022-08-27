@@ -9,5 +9,7 @@ sleep(10000)
 wait_until_detected("TEAM_RANK_F")
 print("TEAM RANK F発見. ロビーと確認. 障害ダイアログなどなし")
 
+get_item2()
+
 go_to_gacha()
 gacha_repeat()

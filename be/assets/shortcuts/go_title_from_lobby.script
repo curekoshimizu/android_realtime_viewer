@@ -5,13 +5,9 @@ sleep(1000)
 click(290, 1874)
 
 
-wait_until_detected("BLUE_SKY")
-click(100, 100)
-print("blue sky")
+on_detect("BLUE_SKY", 5, "blue sky", click, 997, 2246)
 
-wait_until_detected("CYGAMES")
-click(100, 100)
-print("Cygames")
+on_detect("CYGAMES", 5, "Cygames", click, 997, 2246)
 
 
 wait_until_detected("CRIWARE")

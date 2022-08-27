@@ -1,0 +1,20 @@
+print("get_item2")
+wait_until_detected("TEAM_RANK_F")
+print("TEAM RANK F発見. ロビーと確認. 障害ダイアログなどなし")
+
+click(990, 1668)
+sleep(2000)
+click(1006, 2246)
+sleep(2000)
+click(412, 880)
+sleep(2000)
+click(543, 2062)
+sleep(2000)
+click(555, 1516)
+sleep(2000)
+click(531, 2263)
+sleep(1000)
+
+
+wait_until_detected("TEAM_RANK_F")
+print("TEAM RANK F発見. ロビーと確認. 障害ダイアログなどなし")

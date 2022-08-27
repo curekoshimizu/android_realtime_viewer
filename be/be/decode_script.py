@@ -147,7 +147,7 @@ class DecodeScript:
         y = np.array(image2).astype(np.int16).flatten()
         diff = np.absolute(x - y)
         ret = (diff < threshold).sum() == len(x)
-        return ret
+        return ret, diff
 
     def _print(self, args: list[TokenInfo]) -> None:
         assert len(args) == 1
@@ -191,7 +191,7 @@ class DecodeScript:
             print(args[2].string)
 
 
-    def _wait_until_detected(self, args: list[TokenInfo], maximum_time: int = 10, timeout_error: bool = True) -> bool:
+    def _wait_until_detected(self, args: list[TokenInfo], maximum_time: int = 20, timeout_error: bool = True) -> bool:
         assert len(args) == 1
         assert args[0].type == STRING
 
@@ -214,12 +214,14 @@ class DecodeScript:
                 image = frame.raw_image
                 image = image.crop((x, y, x + width, y + height))
                 image = image.convert(origin.mode)
-                if self._detected(image, origin):
+                detected, diff =  self._detected(image, origin)
+                if detected:
                     return True
                 if time.time() - stime > maximum_time:
                     if timeout_error:
                         print("error", args)
                         image.save("debug_screen_image.png")
+                        print(diff)
                         import ipdb; ipdb.set_trace()
                         raise TimeoutError()
                     else:
