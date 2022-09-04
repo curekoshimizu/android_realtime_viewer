@@ -13,7 +13,7 @@ sleep(2000)
 click(555, 1516)
 sleep(2000)
 click(531, 2263)
-sleep(1000)
+sleep(2000)
 
 
 wait_until_detected("TEAM_RANK_F")

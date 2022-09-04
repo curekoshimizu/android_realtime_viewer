@@ -222,7 +222,6 @@ class DecodeScript:
                         print("error", args)
                         image.save("debug_screen_image.png")
                         print(diff)
-                        import ipdb; ipdb.set_trace()
                         raise TimeoutError()
                     else:
                         return False

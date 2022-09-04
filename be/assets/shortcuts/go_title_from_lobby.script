@@ -7,8 +7,6 @@ click(290, 1874)
 
 on_detect("BLUE_SKY", 5, "blue sky", click, 997, 2246)
 
-on_detect("CYGAMES", 5, "Cygames", click, 997, 2246)
-
 
 wait_until_detected("CRIWARE")
 print("HOME画面検出完了")
